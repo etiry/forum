@@ -1,13 +1,11 @@
 const Post = (name, message) => {
   const upvotes = 0;
-  const downvotes = 0;
   const index = null;
 
   return {
     name,
     message,
     upvotes,
-    downvotes,
     index
   }
 }
@@ -55,7 +53,8 @@ function addPost () {
   postedByDiv.innerHTML = `Posted By: <strong>${newPost.name}</strong>`;
 
   const voteDiv = document.createElement('div');
-  voteDiv.innerHTML = '<i class="fa-solid fa-thumbs-up"></i> <i class="fa-solid fa-thumbs-down"></i> <hr class="hr" />'
+  voteDiv.setAttribute('class', 'votes');
+  voteDiv.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> ${newPost.upvotes} <i class="fa-solid fa-thumbs-down"></i> <hr class="hr" />`
 
   postDiv.appendChild(messageDiv);
   postDiv.appendChild(postedByDiv);
@@ -66,21 +65,35 @@ function addPost () {
   messageInput.value = '';
   nameInput.value = '';
 
-  const upvote = document.querySelector('.fa-thumbs-up');
-  const downvote = document.querySelector('.fa-thumbs-down');
-
-  upvote.addEventListener('click', countUpvote);
-  downvote.addEventListener('click', countDownvote);
+  addVoteEventListeners();
 }
 
 function countUpvote (e) {
   const postIndex = e.target.parentElement.parentElement.dataset.index;
 
   myPosts.posts[postIndex].upvotes += 1;
+
+  updateVoteDiv(e, myPosts.posts[postIndex]);
 }
 
 function countDownvote (e) {
   const postIndex = e.target.parentElement.parentElement.dataset.index;
 
-  myPosts.posts[postIndex].downvotes += 1;
+  myPosts.posts[postIndex].upvotes -= 1;
+
+  updateVoteDiv(e, myPosts.posts[postIndex]);
+}
+
+function updateVoteDiv (e, post) {
+  const voteDiv = e.target.parentElement;
+  voteDiv.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> ${post.upvotes} <i class="fa-solid fa-thumbs-down"></i> <hr class="hr" />`
+  addVoteEventListeners();
+}
+
+function addVoteEventListeners () {
+  const upvote = document.querySelector('.fa-thumbs-up');
+  const downvote = document.querySelector('.fa-thumbs-down');
+
+  upvote.addEventListener('click', countUpvote);
+  downvote.addEventListener('click', countDownvote);
 }
