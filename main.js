@@ -31,7 +31,6 @@ const nameInput = document.querySelector('#name');
 const messageInput = document.querySelector('#message');
 const submitButton = document.querySelector('#submit');
 
-
 submitButton.addEventListener('click', addPost);
 
 function createNewPost (name, message) {
@@ -43,29 +42,39 @@ function addPost () {
 
   myPosts.addPostToList(newPost);
 
-  const postDiv = document.createElement('div');
-  postDiv.setAttribute('data-index', newPost.index);
+  displayPosts(myPosts.posts);
+}
 
-  const messageDiv = document.createElement('div')
-  messageDiv.innerHTML = newPost.message;
+function displayPosts (currentPosts) {
+  postsDiv.innerHTML = '';
 
-  const postedByDiv = document.createElement('div')
-  postedByDiv.innerHTML = `Posted By: <strong>${newPost.name}</strong>`;
+  sortPosts(currentPosts);
+  
+  currentPosts.forEach (function (post) {
+    const postDiv = document.createElement('div');
+    postDiv.setAttribute('data-index', post.index);
 
-  const voteDiv = document.createElement('div');
-  voteDiv.setAttribute('class', 'votes');
-  voteDiv.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> ${newPost.upvotes} <i class="fa-solid fa-thumbs-down"></i> <hr class="hr" />`
+    const messageDiv = document.createElement('div')
+    messageDiv.innerHTML = post.message;
 
-  postDiv.appendChild(messageDiv);
-  postDiv.appendChild(postedByDiv);
-  postDiv.appendChild(voteDiv);
+    const postedByDiv = document.createElement('div')
+    postedByDiv.innerHTML = `Posted By: <strong>${post.name}</strong>`;
 
-  postsDiv.appendChild(postDiv);
+    const voteDiv = document.createElement('div');
+    voteDiv.setAttribute('class', 'votes');
+    voteDiv.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> ${post.upvotes} <i class="fa-solid fa-thumbs-down"></i> <hr class="hr" />`
 
-  messageInput.value = '';
-  nameInput.value = '';
+    postDiv.appendChild(messageDiv);
+    postDiv.appendChild(postedByDiv);
+    postDiv.appendChild(voteDiv);
 
-  addVoteEventListeners();
+    postsDiv.appendChild(postDiv);
+
+    messageInput.value = '';
+    nameInput.value = '';
+
+    addVoteEventListeners();
+  })
 }
 
 function countUpvote (e) {
@@ -73,7 +82,7 @@ function countUpvote (e) {
 
   myPosts.posts[postIndex].upvotes += 1;
 
-  updateVoteDiv(e, myPosts.posts[postIndex]);
+  displayPosts(myPosts.posts);
 }
 
 function countDownvote (e) {
@@ -81,19 +90,24 @@ function countDownvote (e) {
 
   myPosts.posts[postIndex].upvotes -= 1;
 
-  updateVoteDiv(e, myPosts.posts[postIndex]);
-}
-
-function updateVoteDiv (e, post) {
-  const voteDiv = e.target.parentElement;
-  voteDiv.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> ${post.upvotes} <i class="fa-solid fa-thumbs-down"></i> <hr class="hr" />`
-  addVoteEventListeners();
+  displayPosts(myPosts.posts);
 }
 
 function addVoteEventListeners () {
-  const upvote = document.querySelector('.fa-thumbs-up');
-  const downvote = document.querySelector('.fa-thumbs-down');
+  const upvote = document.querySelectorAll('.fa-thumbs-up');
+  const downvote = document.querySelectorAll('.fa-thumbs-down');
 
-  upvote.addEventListener('click', countUpvote);
-  downvote.addEventListener('click', countDownvote);
+  upvote.forEach((icon) => icon.addEventListener('click', countUpvote));
+  downvote.forEach((icon) => icon.addEventListener('click', countDownvote));
+}
+
+function sortPosts (currentPosts) {
+  const sortedPosts = currentPosts.sort(function (a, b) {
+    if (a.upvotes > b.upvotes) {
+      return -1;
+    } else {
+      return 1;
+    }
+  })
+  sortedPosts.forEach((post) => post.index = sortedPosts.indexOf(post));
 }
