@@ -60,13 +60,27 @@ function displayPosts (currentPosts) {
     const postedByDiv = document.createElement('div')
     postedByDiv.innerHTML = `Posted By: <strong>${post.name}</strong>`;
 
+    const iconDiv = document.createElement('div');
+    iconDiv.setAttribute('class', 'icons');
+
     const voteDiv = document.createElement('div');
     voteDiv.setAttribute('class', 'votes');
-    voteDiv.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> ${post.upvotes} <i class="fa-solid fa-thumbs-down"></i> <hr class="hr" />`
+    voteDiv.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> ${post.upvotes} <i class="fa-solid fa-thumbs-down"></i>`
+
+    const deleteEditDiv = document.createElement('div');
+    deleteEditDiv.setAttribute('class', 'delete-edit-post');
+    deleteEditDiv.innerHTML = '<i class="fa-solid fa-trash"></i> <i class="fa-solid fa-pen-to-square"></i>'
+
+    const divider = document.createElement('hr');
+    divider.setAttribute('class', 'hr');
+
+    iconDiv.appendChild(voteDiv);
+    iconDiv.appendChild(deleteEditDiv);
 
     postDiv.appendChild(messageDiv);
     postDiv.appendChild(postedByDiv);
-    postDiv.appendChild(voteDiv);
+    postDiv.appendChild(iconDiv);
+    postDiv.appendChild(divider);
 
     postsDiv.appendChild(postDiv);
 
@@ -74,6 +88,8 @@ function displayPosts (currentPosts) {
     nameInput.value = '';
 
     addVoteEventListeners();
+    addDeleteEventListeners();
+    addEditEventListeners();
   })
 }
 
@@ -94,11 +110,23 @@ function countDownvote (e) {
 }
 
 function addVoteEventListeners () {
-  const upvote = document.querySelectorAll('.fa-thumbs-up');
-  const downvote = document.querySelectorAll('.fa-thumbs-down');
+  const upvoteIcons = document.querySelectorAll('.fa-thumbs-up');
+  const downvoteIcons = document.querySelectorAll('.fa-thumbs-down');
 
-  upvote.forEach((icon) => icon.addEventListener('click', countUpvote));
-  downvote.forEach((icon) => icon.addEventListener('click', countDownvote));
+  upvoteIcons.forEach((icon) => icon.addEventListener('click', countUpvote));
+  downvoteIcons.forEach((icon) => icon.addEventListener('click', countDownvote));
+}
+
+function addDeleteEventListeners () {
+  const deleteIcons = document.querySelectorAll('.fa-trash');
+
+  deleteIcons.forEach((icon) => icon.addEventListener('click', deletePost));
+}
+
+function addEditEventListeners () {
+  const editIcons = document.querySelectorAll('.fa-pen-to-square');
+
+  editIcons.forEach((icon) => icon.addEventListener('click', editPost));
 }
 
 function sortPosts (currentPosts) {
@@ -110,4 +138,22 @@ function sortPosts (currentPosts) {
     }
   })
   sortedPosts.forEach((post) => post.index = sortedPosts.indexOf(post));
+}
+
+function deletePost (e) {
+  const postIndex = e.target.parentElement.parentElement.parentElement.dataset.index;
+
+  myPosts.posts.splice(postIndex, 1);
+
+  displayPosts(myPosts.posts);
+}
+
+function editPost (e) {
+  const postIndex = e.target.parentElement.parentElement.parentElement.dataset.index;
+
+  const editedMessage = prompt('Please enter your new message:');
+
+  myPosts.posts[postIndex].message = editedMessage;
+
+  displayPosts(myPosts.posts);
 }
